@@ -1,16 +1,24 @@
 {
   "name": "web-crawler",
   "version": "1.0.0",
-  "description": "",
+  "description": "API de scraping con Express + Puppeteer para App Service Linux",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node index.js",
- "postinstall": "npx puppeteer browsers install chrome"
+    "postinstall": "npx puppeteer browsers install chrome"
   },
-  "keywords": [],
+  "engines": {
+    "node": ">=18 <=24"
+  },
+  "keywords": [
+    "puppeteer",
+    "express",
+    "scraping",
+    "azure-app-service"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "axios": "^1.13.2",
     "cheerio": "^1.1.2",
