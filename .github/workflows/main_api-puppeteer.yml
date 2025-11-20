@@ -13,22 +13,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '24.x'
+          node-version: '24'     # puedes usar '20' o '24'; tu App Service indica Node v24
+          cache: 'npm'
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+      - name: Install dependencies
+        run: npm ci
 
+      # 👇 Paso CLAVE para Puppeteer: descarga el navegador (Chrome for Testing)
+      - name: Ensure Chrome for Puppeteer is installed
+        run: npx puppeteer browsers install chrome
+
+      # (Opcional) Build/Tests si los tuvieras
+      - name: Build (optional)
+        run: npm run build --if-present
+
+      - name: Test (optional)
+        run: npm test --if-present
+
+      # Empaqueta artefacto para el job de deploy
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -38,18 +49,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
-      - name: 'Deploy to Azure Web App'
+
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'API-puppeteer'
+          app-name: 'API-puppeteer'  # ⚠️ Cambia al nombre exacto de tu Web App si es distinto
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9834F2F86C75482388A457A6D588AC24 }}
